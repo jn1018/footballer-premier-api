@@ -3,12 +3,16 @@ class Category{
 
 	// database connection and table name
 	private $conn;
-	private $table_name = "categories";
+	private $table_name = "fb_squads";
 
 	// object properties
 	public $id;
 	public $name;
-	public $description;
+	public $min_played;
+	public $wins;
+	public $draws;
+	public $losses;
+	public $points;
 	public $created;
 
 	public function __construct($db){
@@ -19,7 +23,7 @@ class Category{
 	public function export_CSV(){
 
 		//select all data
-		$query = "SELECT id, name, description, created, modified FROM " . $this->table_name;
+		$query = "SELECT id, name, min_played, created, modified FROM " . $this->table_name;
 		$stmt = $this->conn->prepare($query);
 		$stmt->execute();
 
@@ -88,7 +92,7 @@ class Category{
 
 	public function update(){
 
-		// update the category
+		// update the squad
 		$query = "UPDATE " . $this->table_name . "
 				SET name = :name, description = :description
 				WHERE id = :id";
@@ -136,22 +140,20 @@ class Category{
 	}
 
 	public function create(){
-		// create the category
+		// create the squad
 		// insert query
-		$query = "INSERT INTO categories
-				SET name = ?, description = ?, created = ?";
+		$query = "INSERT INTO fb_squads
+				SET name = ?, created = ?";
 
 		// prepare query statement
 		$stmt = $this->conn->prepare($query);
 
 		// sanitize
 		$this->name=htmlspecialchars(strip_tags($this->name));
-		$this->description=htmlspecialchars(strip_tags($this->description));
 		$this->created=htmlspecialchars(strip_tags($this->created));
 
 		// bind values
 		$stmt->bindParam(1, $this->name);
-		$stmt->bindParam(2, $this->description);
 		$stmt->bindParam(3, $this->created);
 
 		// execute query
@@ -165,11 +167,11 @@ class Category{
 	// get search results with pagination
 	public function searchPaging($search_term, $from_record_num, $records_per_page){
 
-		// search category based on search term
+		// search squad based on search term
 		// search query
-		$query = "SELECT id, name, description
+		$query = "SELECT id, name
 				FROM " . $this->table_name . "
-				WHERE name LIKE ? OR description LIKE ?
+				WHERE name LIKE ? 
 				ORDER BY name ASC
 				LIMIT ?, ?";
 
@@ -190,10 +192,10 @@ class Category{
 		return $stmt;
 	}
 
-	// count all categories
+	// count all squads
 	public function count(){
 		// query to count all data
-		$query = "SELECT COUNT(*) as total_rows FROM categories";
+		$query = "SELECT COUNT(*) as total_rows FROM fb_squads";
 
 		// prepare query statement
 		$stmt = $this->conn->prepare($query);
@@ -205,11 +207,11 @@ class Category{
 		return $total_rows;
 	}
 
-	// count all categories with search term
+	// count all squads with search term
 	public function countSearch($keywords){
 
 		// search query
-		$query = "SELECT COUNT(*) as total_rows FROM categories WHERE name LIKE ? OR description LIKE ?";
+		$query = "SELECT COUNT(*) as total_rows FROM fb_squads WHERE name LIKE ?";
 
 		// prepare query statement
 		$stmt = $this->conn->prepare($query);
@@ -228,8 +230,8 @@ class Category{
 
 	// read all with paging
 	public function readPaging($from_record_num, $records_per_page){
-		// read all categories from the database
-		$query = "SELECT id, name, description
+		// read all squads from the database
+		$query = "SELECT id, name, mim_played
 				FROM " . $this->table_name . "
 				ORDER BY id DESC
 				LIMIT ?, ?";
@@ -252,7 +254,7 @@ class Category{
 
 		//select all data
 		$query = "SELECT
-					id, name, description
+					id, name, min_played
 				FROM
 					" . $this->table_name . "
 				ORDER BY
@@ -268,7 +270,7 @@ class Category{
 	public function searchAll_WithoutPagination($keywords){
 		//select all data
 		$query = "SELECT
-					id, name, description
+					id, name, min_played
 				FROM
 					" . $this->table_name . "
 				WHERE

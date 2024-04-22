@@ -1,17 +1,18 @@
 <?php
-class Product{
+class Player{
 
 	// database connection and table name
 	private $conn;
-	private $table_name = "products";
+	private $table_name = "fb_players";
 
 	// object properties
 	public $id;
-	public $name;
-	public $description;
-	public $price;
-	public $category_id;
-	public $category_name;
+	public $first_name;
+	public $last_name;
+	public $position;
+	public $nation;
+	public $squad_id;
+	public $squad_name;
 	public $created;
 
 	// constructor with $db as database connection
@@ -23,14 +24,14 @@ class Product{
 	public function export_CSV(){
 
 		//select all data
-		$query = "SELECT id, name, description, price, created, modified FROM products";
+		$query = "SELECT id, first_name, last_name, position, nation, created, modified FROM players";
 		$stmt = $this->conn->prepare($query);
 		$stmt->execute();
 
 		//this is how to get number of rows returned
 		$num = $stmt->rowCount();
 
-		$out = "ID,Name,Description,Price,Created,Modified\n";
+		$out = "ID,First Name,Last Name,Position,Nation,Created,Modified\n";
 
 		if($num>0){
 			//retrieve our table contents
@@ -41,14 +42,14 @@ class Product{
 				//this will make $row['name'] to
 				//just $name only
 				extract($row);
-				$out.="{$id},\"{$name}\",\"{$description}\",{$price},{$created},{$modified}\n";
+				$out.="{$id},\"{$first_name}\",\"{$last_name}\",{$position},{$nation},{$created},{$modified}\n";
 			}
 		}
 
 		return $out;
 	}
 
-	// used for paging products
+	// used for paging players
 	public function count(){
 		$query = "SELECT COUNT(*) as total_rows FROM " . $this->table_name . "";
 
@@ -59,17 +60,17 @@ class Product{
 		return $row['total_rows'];
 	}
 
-	// used for paging products
+	// used for paging players
 	public function countSearch($keywords){
 
 		$query = "SELECT COUNT(*) as total_rows
 					FROM
 						" . $this->table_name . " p
-						LEFT JOIN categories c
-							ON p.category_id = c.id
-					WHERE p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ?";
+						LEFT JOIN fb_squads s
+							ON p.squad_id = s.id
+					WHERE p.last_name LIKE ? OR p.position LIKE ? OR s.name LIKE ?";
 
-		$stmt = $this->conn->prepare( $query );
+		$stmt = $this->conn->prepare($query);
 
 		// sanitize
 		$keywords=htmlspecialchars(strip_tags($keywords));
@@ -86,30 +87,32 @@ class Product{
 		return $row['total_rows'];
 	}
 
-	// create product
+	// create player
 	function create(){
 
 		// query to insert record
 		$query = "INSERT INTO
 					" . $this->table_name . "
 				SET
-					name=:name, price=:price, description=:description, category_id=:category_id, created=:created";
+					first_name=:first_name, last_name=:last_name, position=:position, nation=:nation, squad_id=:squad_id, created=:created";
 
 		// prepare query
 		$stmt = $this->conn->prepare($query);
 
 		// sanitize
-		$this->name=htmlspecialchars(strip_tags($this->name));
-		$this->price=htmlspecialchars(strip_tags($this->price));
-		$this->description=htmlspecialchars(strip_tags($this->description));
-		$this->category_id=htmlspecialchars(strip_tags($this->category_id));
+		$this->first_name=htmlspecialchars(strip_tags($this->first_name));
+		$this->last_name=htmlspecialchars(strip_tags($this->last_name));
+		$this->position=htmlspecialchars(strip_tags($this->position));
+		$this->nation=htmlspecialchars(strip_tags($this->nation));
+		$this->squad_id=htmlspecialchars(strip_tags($this->squad_id));
 		$this->created=htmlspecialchars(strip_tags($this->created));
 
 		// bind values
-		$stmt->bindParam(":name", $this->name);
-		$stmt->bindParam(":price", $this->price);
-		$stmt->bindParam(":description", $this->description);
-		$stmt->bindParam(":category_id", $this->category_id);
+		$stmt->bindParam(":first_name", $this->first_name);
+		$stmt->bindParam(":last_name", $this->last_name);
+		$stmt->bindParam(":position", $this->position);
+		$stmt->bindParam(":nation", $this->nation);
+		$stmt->bindParam(":squad_id", $this->squad_id);
 		$stmt->bindParam(":created", $this->created);
 
 		// execute query
@@ -124,17 +127,17 @@ class Product{
 		}
 	}
 
-	// read products
+	// read players
 	public function read(){
 
 		// select all query
 		$query = "SELECT
-					c.name as category_name, p.id, p.name, p.description, p.price, p.category_id, p.created
+					s.name as squad_name, p.id, p.last_name, p.position, p.nation, p.squad_id, p.created
 				FROM
 					" . $this->table_name . " p
 					LEFT JOIN
-						categories c
-							ON p.category_id = c.id
+						fb_squads s
+							ON p.squad_id = s.id
 				ORDER BY
 					p.created DESC";
 
@@ -147,17 +150,17 @@ class Product{
 		return $stmt;
 	}
 
-	// search products with pagination
+	// search players with pagination
 	function searchPaging($keywords, $from_record_num, $records_per_page){
 
 		// select all query
 		$query = "SELECT
-					c.name as category_name, p.id, p.name, p.description, p.price, p.category_id, p.created
+					s.name as squad_name, p.id, p.last_name, p.position, p.nation, p.squad_id, p.created
 				FROM
 					" . $this->table_name . " p
-					LEFT JOIN categories c
-						ON p.category_id = c.id
-				WHERE p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ?
+					LEFT JOIN fb_squads s
+						ON p.squad_id = s.id
+				WHERE p.last_name LIKE ? OR p.position LIKE ? OR s.name LIKE ?
 				ORDER BY p.created DESC
 				LIMIT ?, ?";
 
@@ -181,7 +184,7 @@ class Product{
 		return $stmt;
 	}
 
-	// search products
+	// search players
 	function search($keywords){
 
 		// select all query
@@ -215,8 +218,8 @@ class Product{
 		return $stmt;
 	}
 
-	// read products
-	function readAllProductsByCategoryId(){
+	// read players
+	function readAllPlayersByCategoryId(){
 
 		// select all query
 		$query = "SELECT
@@ -234,7 +237,7 @@ class Product{
 		// prepare query statement
 		$stmt = $this->conn->prepare($query);
 
-		// bind id of product to be updated
+		// bind id of player to be updated
 		$stmt->bindParam(1, $this->category_id);
 
 		// execute query
@@ -243,7 +246,7 @@ class Product{
 		return $stmt;
 	}
 
-	// used when filling up the update product form
+	// used when filling up the update player form
 	function readOne(){
 
 		// query to read single record
@@ -262,7 +265,7 @@ class Product{
 		// prepare query statement
 		$stmt = $this->conn->prepare( $query );
 
-		// bind id of product to be updated
+		// bind id of player to be updated
 		$stmt->bindParam(1, $this->id);
 
 		// execute query
@@ -279,7 +282,7 @@ class Product{
 		$this->category_name = $row['category_name'];
 	}
 
-	// read products with pagination
+	// read players with pagination
 	public function readPaging($from_record_num, $records_per_page){
 
 		// select query
@@ -307,7 +310,7 @@ class Product{
 		return $stmt;
 	}
 
-	// update the product
+	// update the player
 	function update(){
 
 		// update query
@@ -346,7 +349,7 @@ class Product{
 		}
 	}
 
-	// delete the product
+	// delete the player
 	function delete(){
 
 		// delete query
@@ -370,7 +373,7 @@ class Product{
 
 	}
 
-	// delete selected products
+	// delete selected players
 	public function deleteSelected($ids){
 
 		$in_ids = str_repeat('?,', count($ids) - 1) . '?';
