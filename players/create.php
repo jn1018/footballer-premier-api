@@ -22,16 +22,18 @@ $data = json_decode(file_get_contents("php://input"));
 
 // make sure data is not empty
 if(
-	!empty($data->name) &&
+	!empty($data->first_name) &&
 	!empty($data->last_name) &&
 	!empty($data->position) &&
+	!empty($data->nation) &&
 	!empty($data->squad_id)
 ){
 
 	// set player property values
-	$player->name = $data->name;
+	$player->name = $data->first_name;
 	$player->last_name = $data->last_name;
 	$player->position = $data->position;
+	$player->nation = $data->nation;
 	$player->squad_id = $data->squad_id;
 	$player->created = date('Y-m-d H:i:s');
 

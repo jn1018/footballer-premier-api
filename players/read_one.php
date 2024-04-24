@@ -8,30 +8,31 @@ header('Content-Type: application/json');
 
 // include database and object files
 include_once '../config/database.php';
-include_once '../objects/product.php';
+include_once '../objects/player.php';
 
 // get database connection
 $database = new Database();
 $db = $database->getConnection();
 
-// prepare product object
-$product = new Product($db);
+// prepare player object
+$player= new Player($db);
 
 // set ID property of record to read
-$product->id = isset($_GET['id']) ? $_GET['id'] : die();
+$player->id = isset($_GET['id']) ? $_GET['id'] : die();
 
-// read the details of product to be edited
-$product->readOne();
+// read the details of player to be edited
+$player->readOne();
 
-if($product->name!=null){
+if($player->name!=null){
 	// create array
-	$product_arr = array(
-		"id" =>  $product->id,
-		"name" => $product->name,
-		"description" => $product->description,
-		"price" => $product->price,
-		"category_id" => $product->category_id,
-		"category_name" => $product->category_name
+	$player_arr = array(
+		"id" =>  $player->id,
+		"first_name" => $player->first_name,
+		"last_name" => $player->last_name,
+		"position" => $player->position,
+		"nation" => $player->nation,
+		"squad_id" => $player->squad_id,
+		"squad_name" => $player->squad_name
 
 	);
 
@@ -39,14 +40,14 @@ if($product->name!=null){
 	http_response_code(200);
 
 	// make it json format
-	echo json_encode($product_arr);
+	echo json_encode($player_arr);
 }
 
 else{
 	// set response code - 404 Not found
     http_response_code(404);
 
-	// tell the user product does not exist
-	echo json_encode(array("message" => "Product does not exist."));
+	// tell the user player does not exist
+	echo json_encode(array("message" => "player does not exist."));
 }
 ?>

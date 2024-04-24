@@ -189,14 +189,14 @@ class Player{
 
 		// select all query
 		$query = "SELECT
-					c.name as category_name, p.id, p.name, p.description, p.price, p.category_id, p.created
+					s.name as squad_name, p.id, p.last_name, p.position, p.nation, p.squad_id, p.created
 				FROM
 					" . $this->table_name . " p
 					LEFT JOIN
-						categories c
-							ON p.category_id = c.id
+						fb_squads c
+							ON p.squad_id = s.id
 				WHERE
-					p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ?
+					p.last_name LIKE ? OR p.position LIKE ? OR s.name LIKE ?
 				ORDER BY
 					p.created DESC";
 		echo $query;
@@ -223,14 +223,14 @@ class Player{
 
 		// select all query
 		$query = "SELECT
-					c.name as category_name, p.id, p.name, p.description, p.price, p.category_id, p.created
+					s.name as squad_name, p.id, p.last_name, p.position, p.nation, p.squad_id, p.created
 				FROM
 					" . $this->table_name . " p
 					LEFT JOIN
-						categories c
-							ON p.category_id = c.id
+						fb_squads s
+							ON p.squad_id = s.id
 				WHERE
-					p.category_id = ?
+					p.squad_id = ?
 				ORDER BY
 					p.created DESC";
 
@@ -251,12 +251,12 @@ class Player{
 
 		// query to read single record
 		$query = "SELECT
-					c.name as category_name, p.id, p.name, p.description, p.price, p.category_id, p.created
+					s.name as squad_name, p.id, p.last_name, p.position, p.nation, p.squad_id, p.created
 				FROM
 					" . $this->table_name . " p
 					LEFT JOIN
-						categories c
-							ON p.category_id = c.id
+						fb_squads c
+							ON p.squad_id = s.id
 				WHERE
 					p.id = ?
 				LIMIT
@@ -275,11 +275,11 @@ class Player{
 		$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
 		// set values to object properties
-		$this->name = $row['name'];
-		$this->price = $row['price'];
-		$this->description = $row['description'];
-		$this->category_id = $row['category_id'];
-		$this->category_name = $row['category_name'];
+		$this->last_name = $row['last_name'];
+		$this->nation = $row['nation'];
+		$this->position = $row['position'];
+		$this->squad_id = $row['squad_id'];
+		$this->squad_name = $row['squad_name'];
 	}
 
 	// read players with pagination
@@ -287,12 +287,12 @@ class Player{
 
 		// select query
 		$query = "SELECT
-					c.name as category_name, p.id, p.name, p.description, p.price, p.category_id, p.created
+					s.name as squad_name, p.id, p.last_name, p.position, p.nation, p.squad_id, p.created
 				FROM
 					" . $this->table_name . " p
 					LEFT JOIN
-						categories c
-							ON p.category_id = c.id
+						fb_squads s
+							ON p.squad_id = s.id
 				ORDER BY p.created DESC
 				LIMIT ?, ?";
 
@@ -317,10 +317,11 @@ class Player{
 		$query = "UPDATE
 					" . $this->table_name . "
 				SET
-					name = :name,
-					price = :price,
-					description = :description,
-					category_id = :category_id
+					first_name = :first_name,
+					last_name = :last_name,
+					position = :position,
+					nation = :nation,
+					squad_id = :squad_id
 				WHERE
 					id = :id";
 
@@ -328,17 +329,19 @@ class Player{
 		$stmt = $this->conn->prepare($query);
 
 		// sanitize
-		$this->name=htmlspecialchars(strip_tags($this->name));
-		$this->price=htmlspecialchars(strip_tags($this->price));
-		$this->description=htmlspecialchars(strip_tags($this->description));
-		$this->category_id=htmlspecialchars(strip_tags($this->category_id));
+		$this->first_name=htmlspecialchars(strip_tags($this->first_name));
+		$this->last_name=htmlspecialchars(strip_tags($this->last_name));
+		$this->position=htmlspecialchars(strip_tags($this->position));
+		$this->nation=htmlspecialchars(strip_tags($this->nation));
+		$this->squad_id=htmlspecialchars(strip_tags($this->squad_id));
 		$this->id=htmlspecialchars(strip_tags($this->id));
 
 		// bind new values
-		$stmt->bindParam(':name', $this->name);
-		$stmt->bindParam(':price', $this->price);
-		$stmt->bindParam(':description', $this->description);
-		$stmt->bindParam(':category_id', $this->category_id);
+		$stmt->bindParam(':first_name', $this->first_name);
+		$stmt->bindParam(':last_name', $this->last_name);
+		$stmt->bindParam(':position', $this->position);
+		$stmt->bindParam(':nation', $this->nation);
+		$stmt->bindParam(':squad_id', $this->squad_id);
 		$stmt->bindParam(':id', $this->id);
 
 		// execute the query

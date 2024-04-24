@@ -7,29 +7,29 @@ header("Content-Type: application/json; charset=UTF-8");
 include_once '../config/core.php';
 include_once '../shared/utilities.php';
 include_once '../config/database.php';
-include_once '../objects/product.php';
+include_once '../objects/player.php';
 
 // utilities
 $utilities = new Utilities();
 
-// instantiate database and product object
+// instantiate database and player object
 $database = new Database();
 $db = $database->getConnection();
 
 // initialize object
-$product = new Product($db);
+$player = new Player($db);
 
-// query products
-$stmt = $product->readPaging($from_record_num, $records_per_page);
+// query players
+$stmt = $player->readPaging($from_record_num, $records_per_page);
 $num = $stmt->rowCount();
 
 // check if more than 0 record found
 if($num>0){
 
-	// products array
-	$products_arr=array();
-	$products_arr["records"]=array();
-	$products_arr["paging"]=array();
+	// players array
+	$players_arr=array();
+	$players_arr["records"]=array();
+	$players_arr["paging"]=array();
 
 	// retrieve our table contents
 	// fetch() is faster than fetchAll()
@@ -40,30 +40,31 @@ if($num>0){
 		// just $name only
 		extract($row);
 
-		$product_item=array(
+		$player_item=array(
 			"id" => $id,
-			"name" => $name,
-			"description" => html_entity_decode($description),
-			"price" => $price,
-			"category_id" => $category_id,
-			"category_name" => $category_name
+			"first_name" => $first_name,
+			"last_name" => $last_name,
+			"position" => html_entity_decode($position),
+			"nation" => $nation,
+			"squad_id" => $squad_id,
+			"squad_name" => $squad_name
 		);
 
-		array_push($products_arr["records"], $product_item);
+		array_push($players_arr["records"], $player_item);
 	}
 
 
 	// include paging
-	$total_rows=$product->count();
-	$page_url="{$home_url}product/read_paging.php?";
+	$total_rows=$player->count();
+	$page_url="{$home_url}player/read_paging.php?";
 	$paging=$utilities->getPaging($page, $total_rows, $records_per_page, $page_url);
-	$products_arr["paging"]=$paging;
+	$players_arr["paging"]=$paging;
 
 	// set response code - 200 OK
 	http_response_code(200);
 
 	// make it json format
-	echo json_encode($products_arr);
+	echo json_encode($players_arr);
 }
 
 else{
@@ -71,9 +72,9 @@ else{
 	// set response code - 404 Not found
 	http_response_code(404);
 
-	// tell the user products does not exist
+	// tell the user players does not exist
     echo json_encode(
-		array("message" => "No products found.")
+		array("message" => "No players found.")
 	);
 }
 ?>

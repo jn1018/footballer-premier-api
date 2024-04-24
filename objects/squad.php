@@ -23,25 +23,23 @@ class Category{
 	public function export_CSV(){
 
 		//select all data
-		$query = "SELECT id, name, min_played, created, modified FROM " . $this->table_name;
+		$query = "SELECT id, name, min_played, points, created, modified FROM " . $this->table_name;
 		$stmt = $this->conn->prepare($query);
 		$stmt->execute();
 
 		//this is how to get number of rows returned
 		$num = $stmt->rowCount();
 
-		$out = "ID,Name,Description,Created,Modified\n";
+		$out = "ID,Name,MinPlayed,Points,Created,Modified\n";
 
 		if($num>0){
 			//retrieve our table contents
-			//fetch() is faster than fetchAll()
-			//http://stackoverflow.com/questions/2770630/pdofetchall-vs-pdofetch-in-a-loop
 			while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
 				//extract row
 				//this will make $row['name'] to
 				//just $name only
 				extract($row);
-				$out.="{$id},\"{$name}\",\"{$description}\",{$created},{$modified}\n";
+				$out.="{$id},\"{$name}\",\"{$min_played}\",\"{$points}\",{$created},{$modified}\n";
 			}
 		}
 
@@ -231,7 +229,7 @@ class Category{
 	// read all with paging
 	public function readPaging($from_record_num, $records_per_page){
 		// read all squads from the database
-		$query = "SELECT id, name, mim_played
+		$query = "SELECT id, name, min_played
 				FROM " . $this->table_name . "
 				ORDER BY id DESC
 				LIMIT ?, ?";
@@ -274,7 +272,7 @@ class Category{
 				FROM
 					" . $this->table_name . "
 				WHERE
-					name LIKE ? OR description LIKE ?
+					name LIKE ? 
 				ORDER BY
 					name";
 
