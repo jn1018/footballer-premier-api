@@ -4,20 +4,20 @@ header("Content-Type: application/json; charset=UTF-8");
 
 // include database and object files
 include_once '../config/database.php';
-include_once '../objects/category.php';
+include_once '../objects/squad.php';
 
-// instantiate database and category object
+// instantiate database and squad object
 $database = new Database();
 $db = $database->getConnection();
 
 // initialize object
-$category = new Category($db);
+$squad = new Squad($db);
 
 // get keywords
 $keywords=isset($_GET["s"]) ? $_GET["s"] : "";
 
-// query categorys
-$stmt = $category->searchAll_WithoutPagination($keywords);
+// query squads
+$stmt = $squad->searchAll_WithoutPagination($keywords);
 $num = $stmt->rowCount();
 
 // check if more than 0 record found
@@ -38,7 +38,11 @@ if($num>0){
 		$data .= '{';
 			$data .= '"id":'  . $id . ',';
 			$data .= '"name":"'   . $name . '",';
-			$data .= '"description":"'   . $description . '"';
+			$data .= '"min_played":"'   . $min_played . '",';
+			$data .= '"wins":"'   . $wins . '",';
+			$data .= '"draws":"'   . $draws . '",';
+			$data .= '"losses":"'   . $losses . '",';
+			$data .= '"points":"'   . $points . '"';
 		$data .= '}';
 
 		$data .= $x<$num ? ',' : '';
@@ -52,7 +56,7 @@ if($num>0){
 
 else{
     echo '{';
-		echo '"message": "No categories found."';
+		echo '"message": "No squads found."';
 	echo '}';
 }
 ?>

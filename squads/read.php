@@ -5,25 +5,25 @@ header("Content-Type: application/json; charset=UTF-8");
 
 // include database and object files
 include_once '../config/database.php';
-include_once '../objects/category.php';
+include_once '../objects/squad.php';
 
-// instantiate database and category object
+// instantiate database and squad object
 $database = new Database();
 $db = $database->getConnection();
 
 // initialize object
-$category = new Category($db);
+$squad = new Squad($db);
 
-// query categorys
-$stmt = $category->read();
+// query squads
+$stmt = $squad->read();
 $num = $stmt->rowCount();
 
 // check if more than 0 record found
 if($num>0){
 
-	// products array
-	$categories_arr=array();
-	$categories_arr["records"]=array();
+	// squad array
+	$squad_arr=array();
+	$squad_arr["records"]=array();
 
 	// retrieve our table contents
 	// fetch() is faster than fetchAll()
@@ -34,20 +34,24 @@ if($num>0){
 		// just $name only
 		extract($row);
 
-		$category_item=array(
+		$squad_item=array(
 			"id" => $id,
 			"name" => $name,
-			"description" => html_entity_decode($description)
+			"min_played" => $min_played,
+			"wins" => $wins,
+			"draws" => $draws,
+			"losses" => $losses,
+			"points" => $points
 		);
 
-		array_push($categories_arr["records"], $category_item);
+		array_push($squad_arr["records"], $squad_item);
 	}
 
 	// set response code - 200 OK
     http_response_code(200);
 
-	// show categories data in json format
-	echo json_encode($categories_arr);
+	// show squads data in json format
+	echo json_encode($squad_arr);
 }
 
 else{
@@ -55,9 +59,9 @@ else{
 	// set response code - 404 Not found
 	http_response_code(404);
 
-	// tell the user no categories found
+	// tell the user no squads found
     echo json_encode(
-		array("message" => "No categories found.")
+		array("message" => "No squads found.")
 	);
 }
 ?>

@@ -8,34 +8,34 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 // include database and object files
 include_once '../config/database.php';
-include_once '../objects/category.php';
+include_once '../objects/squad.php';
 
-// instantiate database and category object
+// instantiate database and squad object
 $database = new Database();
 $db = $database->getConnection();
 
-$category = new Category($db);
+$squad = new Squad($db);
 
-// get id of category to be edited
+// get id of squad to be edited
 $data = json_decode(file_get_contents("php://input"));
 
-// set ID property of category to be edited
-$category->id = $data->id;
+// set ID property of squad to be edited
+$squad->id = $data->id;
 
-// set category property values
-$category->name = $data->name;
-$category->description = $data->description;
+// set squad property values
+$squad->name = $data->name;
+$squad->description = $data->description;
 
 // execute the query
-if($category->update()){
+if($squad->update()){
 	echo '{';
-		echo '"message": "Category was updated."';
+		echo '"message": "squad was updated."';
 	echo '}';
 }
 
-// if unable to update the category, tell the user
+// if unable to update the squad, tell the user
 else{
 	echo '{';
-		echo '"message": "Unable to update category."';
+		echo '"message": "Unable to update squad."';
 	echo '}';
 }

@@ -1,5 +1,5 @@
 <?php
-class Player{
+class Player {
 
 	// database connection and table name
 	private $conn;

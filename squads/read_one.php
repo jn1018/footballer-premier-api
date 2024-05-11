@@ -8,28 +8,32 @@ header('Content-Type: application/json');
 
 // include database and object files
 include_once '../config/database.php';
-include_once '../objects/category.php';
+include_once '../objects/squad.php';
 
 // get database connection
 $database = new Database();
 $db = $database->getConnection();
 
-// prepare category object
-$category = new Category($db);
+// prepare squad object
+$squad = new Squad($db);
 
 // set ID property of record to read
-$category->id = isset($_GET['id']) ? $_GET['id'] : die();
+$squad->id = isset($_GET['id']) ? $_GET['id'] : die();
 
-// read the details of category to be edited
-$category->readOne();
+// read the details of squad to be edited
+$squad->readOne();
 
 // create array
-$category_arr = array(
-	"id" =>  $category->id,
-	"name" => $category->name,
-	"description" => $category->description
+$squad_arr = array(
+	"id" =>  $squad->id,
+	"name" => $squad->name,
+	"min_played" => $squad->min_played,
+	"wins" => $squad->wins,
+	"draws" => $squad->draws,
+	"losses" => $squad->losses,
+	"points" => $squad->points
 );
 
 // make it json format
-print_r(json_encode($category_arr));
+print_r(json_encode($squad_arr));
 ?>

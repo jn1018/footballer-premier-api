@@ -8,33 +8,37 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 // get database connection
 include_once '../config/database.php';
 
-// instantiate category object
-include_once '../objects/category.php';
+// instantiate squad object
+include_once '../objects/squad.php';
 
 $database = new Database();
 $db = $database->getConnection();
 
-$category = new Category($db);
+$squad = new Squad($db);
 
 // get posted data
 $data = json_decode(file_get_contents("php://input"));
 
-// set category property values
-$category->name = $data->name;
-$category->description = $data->description;
-$category->created = date('Y-m-d H:i:s');
+// set squad property values
+$squad->name = $data->name;
+$squad->min_played = $data->min_played;
+$squad->wins = $data->wins;
+$squad->draws = $data->draws;
+$squad->losses = $data->losses;
+$squad->points = $data->points;
+$squad->created = date('Y-m-d H:i:s');
 
-// create the category
-if($category->create()){
+// create the squad
+if ($squad->create()) {
 	echo '{';
-		echo '"message": "Category was created."';
+		echo '"message": "squad was created."';
 	echo '}';
 }
 
-// if unable to create the category, tell the user
+// if unable to create the squad, tell the user
 else{
 	echo '{';
-		echo '"message": "Unable to create category."';
+		echo '"message": "Unable to create squad."';
 	echo '}';
 }
 ?>

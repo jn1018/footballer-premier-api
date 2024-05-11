@@ -9,7 +9,7 @@ class Utilities{
         // button for first page
         $paging_arr["first"] = $page>1 ? "{$page_url}page=1" : "";
 
-        // count all products in the database to calculate total pages
+        // count all playerss in the database to calculate total pages
         $total_pages = ceil($total_rows / $records_per_page);
 
         // range of links to show

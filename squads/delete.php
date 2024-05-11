@@ -8,29 +8,29 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 // include database and object file
 include_once '../config/database.php';
-include_once '../objects/category.php';
+include_once '../objects/squad.php';
 
 // get database connection
 $database = new Database();
 $db = $database->getConnection();
 
-// prepare category object
-$category = new Category($db);
+// prepare squad object
+$squad = new Squad($db);
 
-// get category id
+// get squad id
 $data = json_decode(file_get_contents("php://input"));
 
-// set category id to be deleted
-$category->id = $data->id;
+// set squad id to be deleted
+$squad->id = $data->id;
 
-// delete the category
-if($category->delete()){
+// delete the squad
+if($squad->delete()){
 	echo '{';
-		echo '"message": "Product was deleted."';
+		echo '"message": "Squad was deleted."';
 	echo '}';
 }
 
-// if unable to delete the category
+// if unable to delete the squad
 else{
 	echo '{';
 		echo '"message": "Unable to delete object."';

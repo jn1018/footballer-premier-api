@@ -1,5 +1,5 @@
 <?php
-class Category{
+class Squad {
 
 	// database connection and table name
 	private $conn;
